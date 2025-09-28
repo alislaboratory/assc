@@ -30,6 +30,22 @@
             </div>
         </div>
 
+        <div class="now-next-container">
+            <div class="card now-next-panel">
+                <h3>What's on Now</h3>
+                <div id="currentEvent">
+                    <p>Loading...</p>
+                </div>
+            </div>
+            
+            <div class="card now-next-panel">
+                <h3>What's on Next</h3>
+                <div id="nextEvent">
+                    <p>Loading...</p>
+                </div>
+            </div>
+        </div>
+
         <div class="card">
             <h2>Conference Schedule</h2>
             <div class="day-tabs">
@@ -55,6 +71,10 @@
         document.addEventListener('DOMContentLoaded', function() {
             setupDayTabs();
             loadSchedule();
+            updateNowNext();
+            
+            // Update now/next every minute
+            setInterval(updateNowNext, 60000);
         });
 
         function setupDayTabs() {
@@ -158,7 +178,162 @@
 
         function refreshSchedule() {
             loadSchedule();
+            updateNowNext();
             showAlert('Schedule refreshed!', 'success');
+        }
+
+        function updateNowNext() {
+            if (currentEvents.length === 0) return;
+            
+            const now = new Date();
+            const currentTime = now.toTimeString().slice(0, 5); // HH:MM format
+            const currentDay = now.getDay(); // 0 = Sunday, 1 = Monday, etc.
+            
+            // For demo purposes, assume conference days are consecutive
+            // In real implementation, you'd map actual dates to conference days
+            const conferenceDay = Math.min(Math.max(1, currentDay), 3);
+            
+            // Get today's events sorted by time
+            const todaysEvents = currentEvents
+                .filter(event => event.day == conferenceDay)
+                .sort((a, b) => a.time.localeCompare(b.time));
+            
+            // Find current and next events
+            const currentEvent = findCurrentEvent(todaysEvents, currentTime);
+            const nextEvent = findNextEvent(todaysEvents, currentTime);
+            
+            // Update the display
+            updateCurrentEventDisplay(currentEvent);
+            updateNextEventDisplay(nextEvent);
+        }
+
+        function findCurrentEvent(events, currentTime) {
+            // Assume events last 90 minutes (1.5 hours)
+            const eventDuration = 90;
+            
+            for (let event of events) {
+                const eventStart = event.time;
+                const eventEnd = addMinutes(eventStart, eventDuration);
+                
+                if (currentTime >= eventStart && currentTime <= eventEnd) {
+                    return event;
+                }
+            }
+            return null;
+        }
+
+        function findNextEvent(events, currentTime) {
+            for (let event of events) {
+                if (event.time > currentTime) {
+                    return event;
+                }
+            }
+            return null;
+        }
+
+        function addMinutes(timeString, minutes) {
+            const [hours, mins] = timeString.split(':').map(Number);
+            const totalMinutes = hours * 60 + mins + minutes;
+            const newHours = Math.floor(totalMinutes / 60) % 24;
+            const newMins = totalMinutes % 60;
+            return `${newHours.toString().padStart(2, '0')}:${newMins.toString().padStart(2, '0')}`;
+        }
+
+        function updateCurrentEventDisplay(event) {
+            const container = document.getElementById('currentEvent');
+            
+            if (!event) {
+                const funMessages = [
+                    "☕ Anyone want coffee? No? Just me then. Rest and Relax!",
+                    "🌱 Network with your peers! Who knows, you might meet your future mentor...",
+                    "💭 I'm just a chill medical student.",
+                    "🤝 Great opportunity to connect with your absolute favourite people in the whole world - med students!",
+                    "📚 Catch up on notes - or don't. The venue is open for you to explore!",
+                    "🍃 No sessions? How chill?! You can't beat this!"
+                ];
+                const randomMessage = funMessages[Math.floor(Math.random() * funMessages.length)];
+                container.innerHTML = `<p class="rest-message">${randomMessage}</p>`;
+                return;
+            }
+            
+            const typeIcon = event.type === 'workshop' ? '🔧' : '🎤';
+            const timeRemaining = calculateTimeRemaining(event.time);
+            
+            container.innerHTML = `
+                <div class="live-event">
+                    <div class="live-indicator">🔴 LIVE</div>
+                    <div class="event-title">${typeIcon} ${event.name}</div>
+                    <div class="event-details">
+                        <div><strong>📍</strong> ${event.location}</div>
+                        <div><strong>👤</strong> ${event.organizer}</div>
+                        <div><strong>⏰</strong> ${timeRemaining}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function updateNextEventDisplay(event) {
+            const container = document.getElementById('nextEvent');
+            
+            if (!event) {
+                container.innerHTML = '<p class="no-next">No more events scheduled for today.</p>';
+                return;
+            }
+            
+            const typeIcon = event.type === 'workshop' ? '🔧' : '🎤';
+            const timeUntil = calculateTimeUntil(event.time);
+            
+            container.innerHTML = `
+                <div class="upcoming-event">
+                    <div class="event-title">${typeIcon} ${event.name}</div>
+                    <div class="event-details">
+                        <div><strong>📍</strong> ${event.location}</div>
+                        <div><strong>👤</strong> ${event.organizer}</div>
+                        <div><strong>⏰</strong> ${timeUntil}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function calculateTimeRemaining(eventTime) {
+            const now = new Date();
+            const eventStart = new Date();
+            const [eventHours, eventMinutes] = eventTime.split(':');
+            eventStart.setHours(parseInt(eventHours), parseInt(eventMinutes), 0, 0);
+            
+            // Add 90 minutes for event duration
+            const eventEnd = new Date(eventStart.getTime() + 90 * 60000);
+            
+            if (now >= eventEnd) return "Event ended";
+            
+            const remaining = eventEnd - now;
+            const remainingMinutes = Math.floor(remaining / 60000);
+            
+            if (remainingMinutes <= 0) return "Ending soon";
+            if (remainingMinutes < 60) return `${remainingMinutes}m remaining`;
+            
+            const hours = Math.floor(remainingMinutes / 60);
+            const minutes = remainingMinutes % 60;
+            return `${hours}h ${minutes}m remaining`;
+        }
+
+        function calculateTimeUntil(eventTime) {
+            const now = new Date();
+            const eventStart = new Date();
+            const [eventHours, eventMinutes] = eventTime.split(':');
+            eventStart.setHours(parseInt(eventHours), parseInt(eventMinutes), 0, 0);
+            
+            if (now >= eventStart) return "Starting now";
+            
+            const until = eventStart - now;
+            const untilMinutes = Math.floor(until / 60000);
+            
+            if (untilMinutes <= 0) return "Starting now";
+            if (untilMinutes < 60) return `in ${untilMinutes}m`;
+            
+            const hours = Math.floor(untilMinutes / 60);
+            const minutes = untilMinutes % 60;
+            return `in ${hours}h ${minutes}m`;
         }
 
         function showAlert(message, type) {
@@ -199,6 +374,7 @@
         socket.on('events_loaded', function(events) {
             currentEvents = events;
             displaySchedule(events);
+            updateNowNext();
         });
     </script>
 
@@ -220,6 +396,71 @@
         .event-card.speaker .event-type-badge {
             background: var(--dark-rose);
             color: var(--white);
+        }
+
+        /* Now/Next Panels Styling */
+        .now-next-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .now-next-panel {
+            text-align: center;
+        }
+
+        .now-next-panel h3 {
+            font-family: 'Abril Fatface', serif;
+            color: var(--rose-red);
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .live-event {
+            background: linear-gradient(135deg, var(--light-pink) 0%, var(--orchid-pink) 100%);
+            border-radius: 8px;
+            padding: 1rem;
+            border: 2px solid var(--rose-red);
+        }
+
+        .live-indicator {
+            background: var(--rose-red);
+            color: var(--white);
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+            animation: pulse 1s infinite;
+        }
+
+        .upcoming-event {
+            background: var(--light-pink);
+            border-radius: 8px;
+            padding: 1rem;
+            border: 2px solid var(--orchid-pink);
+        }
+
+        .rest-message {
+            font-style: italic;
+            color: var(--dark-rose);
+            background: var(--light-pink);
+            padding: 1rem;
+            border-radius: 8px;
+            border: 2px solid var(--orchid-pink);
+        }
+
+        .no-next {
+            color: var(--dark-rose);
+            font-style: italic;
+        }
+
+        @media (max-width: 768px) {
+            .now-next-container {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </body>

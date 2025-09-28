@@ -118,6 +118,59 @@ v0.1/
 - Changes maintain accessibility and contrast ratios
 - Mobile responsiveness preserved across all updates
 
+### Recent Changes (v0.1.2)
+
+#### "What's on Now" and "What's on Next" Panels
+**File: `public/delegate.html`**
+
+- **Added Now/Next Panels** to delegate view:
+  - Two side-by-side panels showing current and upcoming events
+  - Responsive grid layout (stacks on mobile)
+  - Positioned between Quick Links and main schedule
+
+- **Time-based Logic Implementation:**
+  - `updateNowNext()` - Main function that determines current/next events
+  - `findCurrentEvent()` - Finds events currently running (90-minute duration assumed)
+  - `findNextEvent()` - Finds next upcoming event
+  - `calculateTimeRemaining()` - Shows time left in current event
+  - `calculateTimeUntil()` - Shows time until next event starts
+
+- **Smart Event Detection:**
+  - Uses current system time to determine what's happening now
+  - Assumes 90-minute event duration for realistic conference timing
+  - Maps current day of week to conference day (1-3) for demo purposes
+  - Sorts events by time for accurate next-event detection
+
+- **Fun Messages for Breaks:**
+  - 6 different encouraging messages when no events are running:
+    - "☕ Coffee break time! Rest easy and recharge."
+    - "🌱 Take a moment to breathe and network."
+    - "💭 Perfect time for reflection and discussion."
+    - "🤝 Great opportunity to connect with fellow delegates."
+    - "📚 Catch up on notes or explore the venue."
+    - "🍃 Enjoy this peaceful moment between sessions."
+  - Random selection for variety and engagement
+
+- **Visual Design Features:**
+  - Live indicator with pulsing animation for current events
+  - Gradient backgrounds matching color scheme
+  - Event type icons (🔧 workshops, 🎤 speakers)
+  - Time remaining/until calculations with smart formatting
+  - Mobile-responsive grid layout
+
+- **Auto-update Functionality:**
+  - Updates every minute via `setInterval(updateNowNext, 60000)`
+  - Updates on schedule refresh and WebSocket events
+  - Real-time synchronization with admin changes
+
+#### Technical Implementation Details
+- **Time Calculations:** Uses JavaScript Date objects for accurate time handling
+- **Event Duration:** Configurable 90-minute default (can be made dynamic)
+- **Day Mapping:** Simple day-of-week to conference-day mapping for demo
+- **Performance:** Efficient filtering and sorting of events
+- **Error Handling:** Graceful fallbacks when no events found
+- **Responsive Design:** CSS Grid with mobile breakpoint
+
 ### Future Enhancements
 - User authentication for admin panel
 - Event categories and filtering
