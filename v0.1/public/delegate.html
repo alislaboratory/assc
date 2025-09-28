@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASSC 2026 - Live Schedule</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>ASSC 2026 Live Schedule</h1>
+            <p>Real-time conference timetable updates</p>
+        </div>
+
+        <div class="card">
+            <h2>Live Updates</h2>
+            <p>
+                <span class="status-indicator" id="statusIndicator"></span>
+                <span id="statusText">Connecting...</span>
+            </p>
+            <p><small>This page updates automatically when the logistics team makes changes.</small></p>
+        </div>
+
+        <div class="card">
+            <h2>Quick Links</h2>
+            <div class="btn-group">
+                <a href="/admin" class="btn btn-secondary">Admin Panel</a>
+                <button class="btn" onclick="refreshSchedule()">Refresh Schedule</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Conference Schedule</h2>
+            <div class="day-tabs">
+                <a href="#" class="day-tab active" data-day="1">Day 1</a>
+                <a href="#" class="day-tab" data-day="2">Day 2</a>
+                <a href="#" class="day-tab" data-day="3">Day 3</a>
+            </div>
+            
+            <div id="scheduleList">
+                <p>Loading schedule...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="app.js"></script>
+    <script>
+        // Delegate view functionality
+        let currentEvents = [];
+        let selectedDay = '1';
+
+        // Initialize delegate view
+        document.addEventListener('DOMContentLoaded', function() {
+            setupDayTabs();
+            loadSchedule();
+        });
+
+        function setupDayTabs() {
+            const tabs = document.querySelectorAll('.day-tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Update active tab
+                    tabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Filter events
+                    selectedDay = this.dataset.day;
+                    displaySchedule(currentEvents);
+                });
+            });
+        }
+
+        function loadSchedule() {
+            fetch('/api/events')
+                .then(response => response.json())
+                .then(events => {
+                    currentEvents = events;
+                    displaySchedule(events);
+                })
+                .catch(error => {
+                    showAlert('Error loading schedule: ' + error.message, 'error');
+                });
+        }
+
+        function displaySchedule(events) {
+            const container = document.getElementById('scheduleList');
+            
+            if (events.length === 0) {
+                container.innerHTML = '<p>No events scheduled.</p>';
+                return;
+            }
+
+            // Filter by selected day
+            const filteredEvents = events.filter(event => event.day == selectedDay);
+
+            if (filteredEvents.length === 0) {
+                container.innerHTML = '<p>No events for the selected day.</p>';
+                return;
+            }
+
+            // Group by day
+            const eventsByDay = {};
+            filteredEvents.forEach(event => {
+                if (!eventsByDay[event.day]) {
+                    eventsByDay[event.day] = [];
+                }
+                eventsByDay[event.day].push(event);
+            });
+
+            let html = '';
+            Object.keys(eventsByDay).sort().forEach(day => {
+                html += `<h3>Day ${day}</h3>`;
+                html += '<div class="events-grid">';
+                
+                // Sort events by time
+                eventsByDay[day].sort((a, b) => a.time.localeCompare(b.time));
+                
+                eventsByDay[day].forEach(event => {
+                    html += createScheduleCard(event);
+                });
+                
+                html += '</div>';
+            });
+
+            container.innerHTML = html;
+        }
+
+        function createScheduleCard(event) {
+            const typeIcon = event.type === 'workshop' ? '🔧' : '🎤';
+            const typeLabel = event.type === 'workshop' ? 'Workshop' : 'Speaker Session';
+            
+            return `
+                <div class="event-card ${event.type}">
+                    <div class="event-header">
+                        <div>
+                            <div class="event-title">${typeIcon} ${event.name}</div>
+                            <div class="event-time">${event.time}</div>
+                        </div>
+                        <div class="event-type-badge">
+                            ${typeLabel}
+                        </div>
+                    </div>
+                    <div class="event-details">
+                        <div class="event-detail">
+                            <strong>📍 Location:</strong> ${event.location}
+                        </div>
+                        <div class="event-detail">
+                            <strong>👤 Organizer:</strong> ${event.organizer}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function refreshSchedule() {
+            loadSchedule();
+            showAlert('Schedule refreshed!', 'success');
+        }
+
+        function showAlert(message, type) {
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            
+            const container = document.querySelector('.container');
+            container.insertBefore(alert, container.firstChild);
+            
+            setTimeout(() => {
+                alert.remove();
+            }, 3000);
+        }
+
+        // WebSocket event handlers for real-time updates
+        socket.on('event_created', function(event) {
+            currentEvents.push(event);
+            displaySchedule(currentEvents);
+            showAlert(`New event added: ${event.name}`, 'success');
+        });
+
+        socket.on('event_updated', function(event) {
+            const index = currentEvents.findIndex(e => e.id === event.id);
+            if (index !== -1) {
+                currentEvents[index] = event;
+                displaySchedule(currentEvents);
+                showAlert(`Event updated: ${event.name}`, 'success');
+            }
+        });
+
+        socket.on('event_deleted', function(data) {
+            currentEvents = currentEvents.filter(e => e.id !== data.id);
+            displaySchedule(currentEvents);
+            showAlert('Event removed from schedule', 'success');
+        });
+
+        socket.on('events_loaded', function(events) {
+            currentEvents = events;
+            displaySchedule(events);
+        });
+    </script>
+
+    <style>
+        .event-type-badge {
+            background: var(--rose-red);
+            color: var(--white);
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .event-card.workshop .event-type-badge {
+            background: var(--orchid-pink);
+            color: var(--dark-rose);
+        }
+        
+        .event-card.speaker .event-type-badge {
+            background: var(--dark-rose);
+            color: var(--white);
+        }
+    </style>
+</body>
+</html>
