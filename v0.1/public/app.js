@@ -18,6 +18,20 @@ function updateConnectionStatus(connected) {
             statusText.textContent = 'Disconnected - Check your connection';
         }
     }
+    
+    // Update scroll status sidebar
+    const scrollStatusIndicator = document.getElementById('scrollStatusIndicator');
+    const scrollStatusText = document.getElementById('scrollStatusText');
+    
+    if (scrollStatusIndicator && scrollStatusText) {
+        if (connected) {
+            scrollStatusIndicator.className = 'status-indicator status-online';
+            scrollStatusText.textContent = 'Connected';
+        } else {
+            scrollStatusIndicator.className = 'status-indicator status-offline';
+            scrollStatusText.textContent = 'Disconnected';
+        }
+    }
 }
 
 // Socket.IO event handlers

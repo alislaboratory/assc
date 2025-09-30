@@ -22,6 +22,14 @@
             <p><small>This page updates automatically when the logistics team makes changes.</small></p>
         </div>
 
+        <!-- Scroll-triggered connection status sidebar -->
+        <div class="scroll-status" id="scrollStatus">
+            <div class="scroll-status-content">
+                <span class="status-indicator" id="scrollStatusIndicator"></span>
+                <span id="scrollStatusText">Connecting...</span>
+            </div>
+        </div>
+
         <div class="card">
             <h2>Quick Links</h2>
             <div class="btn-group">
@@ -72,10 +80,28 @@
             setupDayTabs();
             loadSchedule();
             updateNowNext();
+            setupScrollStatus();
             
             // Update now/next every minute
             setInterval(updateNowNext, 60000);
         });
+
+        // Scroll-triggered status sidebar configuration
+        const SCROLL_THRESHOLD = 200; // Pixels from top - ADJUST THIS VALUE as needed
+
+        function setupScrollStatus() {
+            const scrollStatus = document.getElementById('scrollStatus');
+            
+            window.addEventListener('scroll', function() {
+                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                
+                if (scrollTop > SCROLL_THRESHOLD) {
+                    scrollStatus.classList.add('visible');
+                } else {
+                    scrollStatus.classList.remove('visible');
+                }
+            });
+        }
 
         function setupDayTabs() {
             const tabs = document.querySelectorAll('.day-tab');
@@ -457,9 +483,51 @@
             font-style: italic;
         }
 
+        /* Scroll-triggered status sidebar */
+        .scroll-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--white);
+            border: 2px solid var(--rose-red);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            box-shadow: 0 4px 12px rgba(181, 55, 87, 0.2);
+            z-index: 1000;
+            transform: translateX(120%);
+            opacity: 0;
+            transition: all 0.3s ease-out;
+            max-width: 200px;
+        }
+
+        .scroll-status.visible {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .scroll-status-content {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--dark-rose);
+        }
+
         @media (max-width: 768px) {
             .now-next-container {
                 grid-template-columns: 1fr;
+            }
+            
+            .scroll-status {
+                top: 10px;
+                right: 10px;
+                padding: 0.5rem 0.75rem;
+                max-width: 150px;
+            }
+            
+            .scroll-status-content {
+                font-size: 0.8rem;
             }
         }
     </style>

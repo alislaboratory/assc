@@ -22,25 +22,25 @@ db.serialize(() => {
   // Insert demo data
   const demoEvents = [
     // Day 1
-    { name: 'Surgical Techniques Workshop', time: '09:00', location: 'Main Hall', organizer: 'Dr. Sarah Chen', type: 'workshop', day: 1 },
-    { name: 'Keynote: Future of Surgery', time: '10:30', location: 'Auditorium', organizer: 'Prof. Michael Torres', type: 'speaker', day: 1 },
-    { name: 'Laparoscopic Skills Lab', time: '14:00', location: 'Lab 1', organizer: 'Dr. Emma Wilson', type: 'workshop', day: 1 },
-    { name: 'Research Presentation', time: '15:30', location: 'Conference Room A', organizer: 'Dr. James Park', type: 'speaker', day: 1 },
-    { name: 'Suturing Masterclass', time: '16:45', location: 'Lab 2', organizer: 'Dr. Lisa Zhang', type: 'workshop', day: 1 },
+    { name: 'Registrations Open', time: '09:00', location: 'Hotel Lobby', organizer: 'Maddie', type: 'workshop', day: 1 },
+    { name: 'Keynote: Future of Surgery', time: '10:30', location: 'Auditorium', organizer: 'Avriel', type: 'speaker', day: 1 },
+    { name: 'Laparoscopic Skills Lab', time: '14:00', location: 'Room 301', organizer: 'Maria', type: 'workshop', day: 1 },
+    { name: 'Research Presentation', time: '15:30', location: 'Conference Room A', organizer: 'Nadia', type: 'speaker', day: 1 },
+    { name: 'Suturing Workshop', time: '16:45', location: 'Room 301', organizer: 'Yusef', type: 'workshop', day: 1 },
     
     // Day 2
-    { name: 'Trauma Surgery Workshop', time: '09:00', location: 'Main Hall', organizer: 'Dr. Robert Kim', type: 'workshop', day: 2 },
-    { name: 'Plenary: Innovation in Medicine', time: '10:30', location: 'Auditorium', organizer: 'Prof. Anna Rodriguez', type: 'speaker', day: 2 },
-    { name: 'Microsurgery Techniques', time: '14:00', location: 'Lab 1', organizer: 'Dr. David Lee', type: 'workshop', day: 2 },
-    { name: 'Case Study Discussion', time: '15:30', location: 'Conference Room B', organizer: 'Dr. Maria Santos', type: 'speaker', day: 2 },
-    { name: 'Emergency Procedures', time: '16:45', location: 'Lab 2', organizer: 'Dr. Alex Thompson', type: 'workshop', day: 2 },
+    { name: 'Trauma Surgery Workshop', time: '09:00', location: 'Main Hall', organizer: 'Angela', type: 'workshop', day: 2 },
+    { name: 'Plenary: Innovation in Medicine', time: '10:30', location: 'Auditorium', organizer: 'Brandon', type: 'speaker', day: 2 },
+    { name: 'Microsurgery Techniques', time: '14:00', location: 'Room 301', organizer: 'Brieanna', type: 'workshop', day: 2 },
+    { name: 'Case Study Discussion', time: '15:30', location: 'Conference Room B', organizer: 'Catherine', type: 'speaker', day: 2 },
+    { name: 'Emergency Procedures', time: '16:45', location: 'Room 301', organizer: 'Daniel', type: 'workshop', day: 2 },
     
     // Day 3
-    { name: 'Cardiovascular Surgery', time: '09:00', location: 'Main Hall', organizer: 'Dr. Jennifer Liu', type: 'workshop', day: 3 },
-    { name: 'Closing Keynote', time: '10:30', location: 'Auditorium', organizer: 'Prof. William Brown', type: 'speaker', day: 3 },
-    { name: 'Robotic Surgery Demo', time: '14:00', location: 'Lab 1', organizer: 'Dr. Sophie Martin', type: 'workshop', day: 3 },
-    { name: 'Research Symposium', time: '15:30', location: 'Conference Room A', organizer: 'Dr. Kevin O\'Connor', type: 'speaker', day: 3 },
-    { name: 'Surgical Innovation Panel', time: '16:45', location: 'Main Hall', organizer: 'Dr. Rachel Green', type: 'speaker', day: 3 }
+    { name: 'Cardiovascular Surgery', time: '09:00', location: 'Main Hall', organizer: 'Gihwan', type: 'workshop', day: 3 },
+    { name: 'Surgical Innovation Panel', time: '10:30', location: 'Auditorium', organizer: 'Hemani', type: 'speaker', day: 3 },
+    { name: 'Robotic Surgery Demo', time: '14:00', location: 'Room 301', organizer: 'Hita', type: 'workshop', day: 3 },
+    { name: 'Research Symposium', time: '15:30', location: 'Conference Room A', organizer: 'Ishan', type: 'speaker', day: 3 },
+    { name: 'Closing Ceremony', time: '16:45', location: 'Main Hall', organizer: 'Issy', type: 'speaker', day: 3 }
   ];
 
   // Clear existing data and insert demo data

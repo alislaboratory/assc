@@ -73,8 +73,7 @@
         <div class="card">
             <h2>Current Events</h2>
             <div class="day-tabs">
-                <a href="#" class="day-tab active" data-day="all">All Days</a>
-                <a href="#" class="day-tab" data-day="1">Day 1</a>
+                <a href="#" class="day-tab active" data-day="1">Day 1</a>
                 <a href="#" class="day-tab" data-day="2">Day 2</a>
                 <a href="#" class="day-tab" data-day="3">Day 3</a>
             </div>
@@ -90,7 +89,7 @@
     <script>
         // Admin-specific functionality
         let currentEvents = [];
-        let selectedDay = 'all';
+        let selectedDay = '1';
 
         // Initialize admin panel
         document.addEventListener('DOMContentLoaded', function() {
@@ -183,9 +182,7 @@
             }
 
             // Filter by selected day
-            const filteredEvents = selectedDay === 'all' 
-                ? events 
-                : events.filter(event => event.day == selectedDay);
+            const filteredEvents = events.filter(event => event.day == selectedDay);
 
             if (filteredEvents.length === 0) {
                 container.innerHTML = '<p>No events for the selected day.</p>';

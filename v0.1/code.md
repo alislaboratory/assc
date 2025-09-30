@@ -171,6 +171,59 @@ v0.1/
 - **Error Handling:** Graceful fallbacks when no events found
 - **Responsive Design:** CSS Grid with mobile breakpoint
 
+### Recent Changes (v0.1.3)
+
+#### Visual Consistency Improvements
+**File: `public/style.css`**
+- **Fixed Event Card Padding:**
+  - Added `padding-left: 1rem` to `.event-header` class
+  - Added `padding-left: 1rem` to `.event-details` class
+  - Ensures consistent spacing from left border to content
+  - Aligns with overall site padding standards
+
+#### Technical Implementation Details
+- **Consistent Spacing:** All padding values align with existing design system
+- **Visual Hierarchy:** Event cards now have proper spacing from colored borders
+- **Maintained Simplicity:** Header remains clean and simple without logo complexity
+
+### Recent Changes (v0.1.4)
+
+#### UX Improvements
+**File: `public/delegate.html`**
+- **Added Scroll-Triggered Connection Status Sidebar:**
+  - Fixed position sidebar that appears when user scrolls down
+  - Shows connection status (Connected/Disconnected) with visual indicator
+  - Smooth ease-out animation (0.3s transition)
+  - Positioned top-right corner with responsive design
+  - Configurable scroll threshold: `SCROLL_THRESHOLD = 200` pixels
+  - Automatically hides when user scrolls back to top
+
+- **Scroll Threshold Configuration:**
+  - Variable `SCROLL_THRESHOLD` on line 90 of delegate.html
+  - Currently set to 200 pixels from top
+  - Easy to adjust if page layout changes
+  - Commented for easy identification: "ADJUST THIS VALUE as needed"
+
+**File: `public/app.js`**
+- **Enhanced Connection Status Updates:**
+  - Modified `updateConnectionStatus()` function to update both main and scroll status
+  - Synchronized status indicators across all UI elements
+  - Maintains consistency between top status and sidebar status
+
+**File: `public/admin.html`**
+- **Removed "All Days" Option:**
+  - Removed "All Days" tab from admin panel day navigation
+  - Changed default selected day from 'all' to '1' (Day 1)
+  - Updated filtering logic to only show events for selected day
+  - Simplified admin interface for better focus
+
+#### Technical Implementation Details
+- **Scroll Detection:** Uses `window.pageYOffset` for cross-browser compatibility
+- **Animation:** CSS transforms and opacity for smooth transitions
+- **Responsive Design:** Smaller sidebar on mobile devices
+- **Z-index Management:** Sidebar positioned above all other content (z-index: 1000)
+- **Performance:** Efficient scroll event handling with minimal DOM manipulation
+
 ### Future Enhancements
 - User authentication for admin panel
 - Event categories and filtering
